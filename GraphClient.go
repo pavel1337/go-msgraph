@@ -121,7 +121,6 @@ func (g *GraphClient) makeGETAPICall(apicall string, getParams url.Values, v int
 	// TODO: MaxPageSize is currently 999, if there are any time more than 999 entries this will make the program unpredictable... hence start to use paging (!)
 	getParams.Add("$top", strconv.Itoa(MaxPageSize))
 	req.URL.RawQuery = getParams.Encode() // set query parameters
-
 	return g.performRequest(req, v)
 }
 
@@ -199,6 +198,38 @@ func (g *GraphClient) GetGroup(groupID string) (Group, error) {
 	group := Group{graphClient: g}
 	err := g.makeGETAPICall(resource, nil, &group)
 	return group, err
+}
+
+// ListSignIns returns a list of Sign-Ins
+//
+// Reference: https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/signin-list
+func (g *GraphClient) ListSignIns() (Signins, error) {
+	resource := "/auditlogs/signIns"
+
+	var marsh struct {
+		Signins Signins `json:"value"`
+	}
+	err := g.makeGETAPICall(resource, nil, &marsh)
+	marsh.Signins.setGraphClient(g)
+	return marsh.Signins, err
+}
+
+
+// ListSignInsWithFilter returns a list of Sign-Ins with filter
+//
+// Reference: https://developer.microsoft.com/en-us/graph/docs/api-reference/v1.0/api/signin-list
+func (g *GraphClient) ListSignInsWithFilter(f string) (Signins, error) {
+	resource := "/auditlogs/signIns"
+
+ 	v := url.Values{}
+ 	v.Set("$filter", f)
+
+	var marsh struct {
+		Signins Signins `json:"value"`
+	}
+	err := g.makeGETAPICall(resource, v, &marsh)
+	marsh.Signins.setGraphClient(g)
+	return marsh.Signins, err
 }
 
 // UnmarshalJSON implements the json unmarshal to be used by the json-library.
