@@ -20,7 +20,7 @@ type Signin struct {
 	ResourceDisplayName			string
 	DeviceDetail				DeviceDetail
 	Location 					Location
-
+	Status 						Status
 	graphClient *GraphClient // the graphClient that called the group
 }
 
@@ -39,6 +39,12 @@ type Location struct {
 type GeoCoordinates struct {
 	Latitude float64 `json:latitude`
 	Longitude float64 `json:longitude`
+}
+
+type Status struct {
+	ErrorCode         int         `json:"errorCode"`
+	FailureReason     string `json:"failureReason"`
+	AdditionalDetails string `json:"additionalDetails"`
 }
 
 
@@ -66,6 +72,7 @@ func (g *Signin) UnmarshalJSON(data []byte) error {
 		DeviceDetail				DeviceDetail `json:"deviceDetail"`
 		Location					Location	`json:"location"`
 		GeoCoordinates					GeoCoordinates	`json:"geoCoordinates"`
+		Status Status `json:"status"`
 	}{}
 
 	err := json.Unmarshal(data, &tmp)
@@ -86,6 +93,7 @@ func (g *Signin) UnmarshalJSON(data []byte) error {
 	g.ResourceDisplayName = tmp.ResourceDisplayName
 	g.DeviceDetail = tmp.DeviceDetail
 	g.Location = tmp.Location
+	g.Status = tmp.Status
 
 	return nil
 }
